@@ -4,30 +4,26 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Note;
-use Validator;
-use App\Http\Resources\Note as NoteResource;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\Note as NoteResources;
 use App\Http\Controllers\API\BaseController as BaseController;
 
-class NoteController extends Controller
+class NoteController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        $notes = Note::all();
-        return $this->sendResponse(NotetResource::collection($notes),('All notes sent');
+        $notes = Note::where('id', Auth::id())->get();
+        return $this->sendResponse(NoteResources::collection($notes), 'All notes');
     }
-
 
 
     public function store(Request $request)
     {
         $input = $request->all();
-       $validator = Validator::make($input , [
+       $validator=Validator::make($input , [
         'title'=> 'required',
         'content'=> 'required',
 
@@ -37,7 +33,7 @@ class NoteController extends Controller
         return $this->sendError('Please validate error' ,$validator->errors() );
           }
     $note = Note::create($input);
-    return $this->sendResponse(new NoteResource($note) ,'Note created successfully' );
+    return $this->sendResponse(new NoteResources($note) ,'Note created successfully' );
     }
 
 
@@ -46,9 +42,9 @@ class NoteController extends Controller
     {
         $note = Note::find($id);
         if ( is_null($note) ) {
-            return $this->sendError('Product not found'  );
+            return $this->sendError('Note not found');
               }
-              return $this->sendResponse(new NoteResource($note) ,'Note found successfully' );
+              return $this->sendResponse(new NoteResources($note) ,'Note founded successfully' );
 
     }
 
@@ -61,7 +57,7 @@ class NoteController extends Controller
         $input = $request->all();
         $validator = Validator::make($input , [
          'title'=> 'required',
-         'content'=> 'required'
+         'content'=> 'required',
 
         ]);
 
@@ -72,16 +68,15 @@ class NoteController extends Controller
      $note->content = $input['content'];
      $note->save();
 
-     return $this->sendResponse(new NoteResource($note) ,'Note updated successfully' );
+     return $this->sendResponse(new NoteResources($note) ,'Note updated successfully' );
     }
-
-
 
 
     public function destroy($id)
     {
+        $note = Note::find($id);
         $note->delete();
-        return $this->sendResponse(new NoteResource($note) ,'Note deleted successfully' );
+        return $this->sendResponse(new NoteResources($note) ,'Note deleted successfully' );
 
     }
 }

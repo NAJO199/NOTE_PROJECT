@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
-use App\User;
 use App\Http\Controllers\API\BaseController as BaseController;
-use App\Http\Controllers\Controller as Controller;
-use Validator;
+use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
-class RegisterController extends Controller
+class RegisterController extends BaseController
 {
     public function register(Request $request)
     {
@@ -46,15 +45,11 @@ public function login(Request $request)
             $success ['token'] = $user->createToken('Najlae')->accessToken;
             $success ['name'] = $user->name;
 
-            return $this->sendResponse($success ,'User login successfully');
+            return $this->sendResponse($success ,'User loged in successfully');
         }
         else {
             return $this->sendError('Please check your Auth' ,['error' =>'Unauthorised']);
         }
 
-
-
-
-
-    }
+   }
 }
